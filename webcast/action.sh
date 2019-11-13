@@ -22,6 +22,8 @@ elif [[ $ACT == 'start' ]]; then
   export X_IMAGE_HASH=$(docker run -d -p 8080:8080 -p 1935:1935 --rm nginx-webcast:latest)
   #export X_IMAGE_HASH=$(docker ps -lq)
   echo "Docker is running with hash '$X_IMAGE_HASH'"
+  sleep 2
+  docker ps
 
 elif [[ $ACT == 'stop' ]]; then
 
@@ -36,6 +38,8 @@ elif [[ $ACT == 'restart' ]]; then
   export X_IMAGE_HASH=$(docker run -d -p 8080:8080 -p 1935:1935 --rm nginx-webcast:latest)
   #export X_IMAGE_HASH=$(docker ps -lq)
   echo "Docker is running with hash '$X_IMAGE_HASH'"
+  sleep 2
+  docker ps
 
 else
 
