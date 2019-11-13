@@ -9,10 +9,6 @@ rtmp {
 
             # enable live streaming
             live on;
-            record off;
-
-            # append current timestamp to each flv
-            record_unique on;
 
             # Only publish to local network
             #allow publish $X_DOCKER_IP;
@@ -21,21 +17,15 @@ rtmp {
             allow play all;
 
             # Record
+            #record on;
+
+            # append current timestamp to each flv
+            #record_unique on;
+
             #record_notify on;
             #record_path /tmp;
             #record all;
             #record_unique on;
-
-            # DASH
-            dash on;
-            #dash_nested on;
-            dash_path /tmp/dash;
-            dash_fragment 3;
-            dash_playlist_length 120;
-            dash_cleanup on;
-
-            #dash_clock_compensation http_head;
-            #dash_clock_helper_uri http://$X_DOCKER_IP:8080/time;
 
             # HLS
             hls on;
@@ -65,21 +55,12 @@ http {
             #rtmp_stat_stylesheet stat.xsl;
         }
 
-        # Return an empty response, used by dash.js to sync with server time
-        #location /time {
-        #    return 200;
-        #}
-
-        location /dash {
-            root /tmp;
-        }
-
         location /hls {
             types {
                 application/vnd.apple.mpegurl m3u8;
             }
-            #root /tmp;
-            alias tmp/hls/;
+            root /tmp;
+            #alias tmp/hls/;
         }
     }
 }
