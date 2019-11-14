@@ -11,7 +11,7 @@ set +a
 if [[ $ACT == 'build' ]] ; then
 
   envsubst '$X_DOCKER_IP' < "nginx.conf.example" > "nginx.conf"
-  envsubst '$X_DOCKER_IP' < "dash.html.example" > "dash.html"
+  envsubst '$X_DOCKER_IP' < "player.html.example" > "player.html"
 
   echo "Building docker with network '$X_DOCKER_IP'"
   docker build -t nginx-webcast:latest -f dockerfile .

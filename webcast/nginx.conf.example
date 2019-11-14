@@ -1,3 +1,11 @@
+
+user www-data www-data;
+
+# https://stackoverflow.com/a/56631458
+events {
+    worker_connections  1024; # usually 1024 is a good default
+}
+
 rtmp {
     server {
         listen 1935;
@@ -11,32 +19,28 @@ rtmp {
             live on;
 
             # Only publish to local network
-            #allow publish $X_DOCKER_IP;
-            #deny publish all;
-            allow publish all;
-            allow play all;
+            allow publish $X_DOCKER_IP;
+            deny publish all;
+            deny play all;
 
             # Record
-            #record on;
-
-            # append current timestamp to each flv
-            #record_unique on;
-
-            #record_notify on;
-            #record_path /tmp;
-            #record all;
-            #record_unique on;
+            recorder all {
+                record all;
+                record_path /tmp/rec;
+                record_unique on;
+                record_suffix -%d-%b-%y-%T.flv;
+                exec_record_done ffmpeg -i $path -f mp4 /tmp/rec/$basename.mp4;
+            }
 
             # HLS
             hls on;
             hls_path /tmp/hls;
             hls_nested on;
+            hls_fragment 10s;
+            hls_playlist_length 30s;
         }
     }
 }
-
-# https://stackoverflow.com/a/56631458
-events {}
 
 # HTTP can be used for accessing RTMP stats
 http {
@@ -60,7 +64,11 @@ http {
                 application/vnd.apple.mpegurl m3u8;
             }
             root /tmp;
-            #alias tmp/hls/;
+        }
+
+        location /recordings {
+            alias /tmp/rec/;
+            autoindex on;
         }
     }
 }
