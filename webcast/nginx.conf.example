@@ -26,10 +26,11 @@ rtmp {
             # Record
             recorder all {
                 record all;
-                record_path /tmp/rec;
+                record_path /var/www/rec;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
-                exec_record_done ffmpeg -i $path -f mp4 /tmp/rec/$basename.mp4;
+                exec_record_done ffmpeg -i $path -f mp4 /var/www/video/$basename.mp4;
+                exec_record_done ffmpeg -i $path -q:a 5 /var/www/audio/$basename.mp3;
             }
 
             # HLS
@@ -45,30 +46,59 @@ rtmp {
 # HTTP can be used for accessing RTMP stats
 http {
     server {
-        listen      8080;
+        listen 8080;
 
         add_header Cache-Control no-cache;
         add_header Access-Control-Allow-Origin * always;
 
-        # This URL provides RTMP statistics in XML
-        location /stat {
-            #stub_status;
-
-            # Use this stylesheet to view XML as web page
-            # in browser
-            #rtmp_stat_stylesheet stat.xsl;
-        }
+        root /tmp/hls/;
 
         location /hls {
             types {
                 application/vnd.apple.mpegurl m3u8;
             }
-            root /tmp;
+            alias /tmp/hls;
         }
 
-        location /recordings {
-            alias /tmp/rec/;
+        location /video {
+            alias /var/www/video;
             autoindex on;
+        }
+
+        location /audio {
+            alias /var/www/audio;
+            autoindex on;
+        }
+    }
+
+    server {
+        listen 80;
+
+        add_header Cache-Control no-cache;
+        add_header Access-Control-Allow-Origin * always;
+
+        root /var/www;
+
+        location / {
+
+            index player.html;
+        }
+    }
+
+    server {
+        listen 8888;
+
+        add_header Cache-Control no-cache;
+        add_header Access-Control-Allow-Origin * always;
+
+        root /var/www/;
+
+        location /stat {
+            rtmp_stat all;
+            rtmp_stat_stylesheet /var/www/stat.xsl;
+        }
+
+        location /stat.xsl {
         }
     }
 }

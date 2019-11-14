@@ -7,14 +7,14 @@ An attempt to make a webcasting platform and website.
 
 ### Setup action.conf ###
 
-Environment varibles to be used by `action.sh`.
+Environment variables to be used by `action.sh`.
 
 The `X_DOCKER_IP` is the bridge ip of the docker network, e.g. `172.17.0.1`.
 This can be found by `ip a | grep docker0 | grep init`.
 We could use `--network=host` on `docker run` but I rather have a locked down network from the start.
 https://docs.docker.com/v17.09/engine/userguide/networking/#default-networks  
 
-### Docker Container Actions ###
+### Docker container actions ###
 
 ```
 cd ./webcast
@@ -32,10 +32,18 @@ source ./action.sh stop
 source ./action.sh restart
 ```
 
-### Broadcast Stream ###
+### Broadcast stream ###
 
-While not the only way, I'm using OBS (Open Broadcast Software, https://obsproject.com/) to transmit an image to `rtmp://$X_DOCKER_IP/channel/`.
+While not the only way, I'm using OBS (Open Broadcast Software, https://obsproject.com/) to transmit an image to `rtmp://$X_DOCKER_IP/stream/`.
 
-### Watch Stream ###
+### Watch stream via RTMP ###
 
-while not the only way, I'm using VLC to receive `rtmp://$X_DOCKER_IP/channel/<key>`.
+While not the only way, I'm using VLC to receive `rtmp://$X_DOCKER_IP/stream/<key>`.
+
+### Watch stream via webpage ###
+
+Go to `http://$X_DOCKER_IP:8080/`.
+
+### Download stream recordings ###
+
+Go to `http://$X_DOCKER_IP:8080/recordings/`
