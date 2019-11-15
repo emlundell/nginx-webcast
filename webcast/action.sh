@@ -3,7 +3,7 @@
 # Export enviroment vars set in action.conf
 # https://unix.stackexchange.com/a/79077
 set -a
-. ./action.conf
+. ./action.env
 set +a
 
 for arg; do
