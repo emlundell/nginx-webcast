@@ -6,11 +6,11 @@
     <h1>Video</h1>
     <div class="media-container">
       <video width="1000px" height="800px">
-        <source type="application/x-mpegURL" src="http://${X_DOCKER_IP}:8080/hls/test/index.m3u8" />
+        <source type="application/x-mpegURL" src="http://${X_DOCKER_IP}:8080/stream/hls/test/index.m3u8" />
       </video>
     </div>
     <div>
-        <audio controls src=src="http://${X_DOCKER_IP}:8080/hls/test/index.m3u8">
+        <audio controls src=src="http://${X_DOCKER_IP}:8080/stream/hls/test/index.m3u8">
             Your browser does not support the <code>audio</code> element.
         </audio>
     </div>
