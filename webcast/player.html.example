@@ -5,20 +5,21 @@
   <body>
     <h1>Video</h1>
     <div class="media-container">
-      <video width="1000px" height="800px">
+      <video id="video-hls" width="1000px" height="800px">
         <source type="application/x-mpegURL" src="http://${X_DOCKER_IP}:8080/stream/hls/test/index.m3u8" />
       </video>
     </div>
-    <div>
-        <audio controls src=src="http://${X_DOCKER_IP}:8080/stream/hls/test/index.m3u8">
-            Your browser does not support the <code>audio</code> element.
-        </audio>
+    <div class="media-container">
+      <video data-dashjs-player controls width="1000px" height="800px">
+        <source type="application/dash+xml" src="http://${X_DOCKER_IP}:8080/stream/dash/test/index.mpd" />
+      </video>
     </div>
 
     <script src="http://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.7/build/mediaelement-and-player.min.js"></script>
+    <script src="http://cdn.dashjs.org/latest/dash.all.min.js"></script>
     <script>
-      $('video, audio').mediaelementplayer(/* Options */);
+      $('#video-hls').mediaelementplayer(/* Options */);
     </script>
   </body>
 </html>
