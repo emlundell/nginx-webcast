@@ -1,9 +1,11 @@
-*
+*/*
 !.gitignore
-!LICENSE
+!LICENSE  
 !README.md
-!webcast/action.sh
 !webcast/action.conf
-!webcast/player.html.example
+!webcast/action.sh
 !webcast/dockerfile
 !webcast/nginx.conf.example
+!webcast/player.html.example
+!webcast/nginx.conf.example
+
