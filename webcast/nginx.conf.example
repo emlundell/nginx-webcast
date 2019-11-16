@@ -24,28 +24,32 @@ rtmp {
             deny play all;
 
             # Record
-            recorder all {
+            recorder video {
                 record all;
-                record_path /var/www/rec;
+                record_path /tmp/stream/rec/video;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
                 exec_record_done ffmpeg -i $path -f mp4 /var/www/video/$basename.mp4;
+            }
+
+            recorder audio {
+                record audio;
+                record_path /tmp/stream/rec/audio;
+                record_unique on;
+                record_suffix -%d-%b-%y-%T.flv;
                 exec_record_done ffmpeg -i $path -q:a 5 /var/www/audio/$basename.mp3;
             }
 
-            # Live converting rtmp to mp3
-            #exec_publish ffmpeg -i $path -vn -acodec libmp3lame -ab 192000 -af "aresample=async=1:min_hard_comp=0.100000:first_pts=0" -f mp3 -y /var/www/audio/rtmprecording.mp3
-
             # HLS
             hls on;
-            hls_path /tmp/hls;
+            hls_path /tmp/stream/hls;
             hls_nested on;
             hls_fragment 10s;
             hls_playlist_length 30s;
 
             # DASH
             dash on;
-            dash_path /tmp/dash;
+            dash_path /tmp/stream/dash;
             dash_nested on;
             dash_fragment 15s;
         }
@@ -67,7 +71,7 @@ http {
                 video/MP2T ts;
                 video/mp4 mp4;
             }
-            alias /tmp/;
+            alias /tmp/stream/;
         }
 
         location /video {
@@ -102,12 +106,5 @@ http {
         location / {
             index player.html;
         }
-    }
-
-    server {
-        listen 8888;
-
-        add_header Cache-Control no-cache;
-        add_header Access-Control-Allow-Origin * always;
     }
 }
