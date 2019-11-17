@@ -19,9 +19,9 @@ rtmp {
             live on;
 
             # Only publish to local network
-            allow publish $X_DOCKER_IP;
-            deny publish all;
-            deny play all;
+            #allow publish $X_DOCKER_IP;
+            #deny publish all;
+            #deny play all;
 
             # Record
             recorder video {
@@ -40,18 +40,31 @@ rtmp {
                 exec_record_done ffmpeg -i $path -q:a 5 /var/www/audio/$basename.mp3;
             }
 
+            # DASH
+            dash on;
+            dash_path /tmp/stream/dash;
+            dash_nested on;
+            dash_fragment 15s;
+
             # HLS
+            exec ffmpeg -i rtmp://localhost/stream/$name
+                -c:a aac -b:a 32k  -c:v libx264 -b:v 128K -f flv rtmp://localhost/hls/$name_low
+                -c:a aac -b:a 64k  -c:v libx264 -b:v 256k -f flv rtmp://localhost/hls/$name_mid
+                -c:a aac -b:a 128k -c:v libx264 -b:v 512K -f flv rtmp://localhost/hls/$name_hi;
+        }
+
+        application hls {
+            live on;
+
             hls on;
             hls_path /tmp/stream/hls;
             hls_nested on;
             hls_fragment 10s;
             hls_playlist_length 30s;
 
-            # DASH
-            dash on;
-            dash_path /tmp/stream/dash;
-            dash_nested on;
-            dash_fragment 15s;
+            hls_variant _low BANDWIDTH=160000;
+            hls_variant _mid BANDWIDTH=320000;
+            hls_variant _hi  BANDWIDTH=640000;
         }
     }
 }

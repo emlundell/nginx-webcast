@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# It might be easier to create an alias: `alias sa="source ./action.sh"`
+
 # Export enviroment vars set in action.conf
 # https://unix.stackexchange.com/a/79077
 set -a
@@ -44,6 +46,11 @@ for arg; do
 
     echo "Entering $X_CONTAINER_HASH"
     docker exec -it $X_CONTAINER_HASH bash
+
+  elif [[ $arg == 'logs' ]]; then
+
+    echo "Getting logs of $X_CONTAINER_HASH"
+    docker logs $X_CONTAINER_HASH | less
 
   else
     echo "No good args provided."
