@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+      dockerfile: dockerfile
+    image: webcast-nginx:latest
+    expose:
+      - 80
+      - 8080
+      - 1935
+    networks:
+      - net
+
+  loadbalancer:
+    container_name: loadbalancer
+    build:
+      context: ./haproxy
+      dockerfile: dockerfile
+    image: webcast-haproxy:latest
+    depends_on:
+      - nginx
+    environment:
+      - BALANCE=leastconn
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80
+      - 8080:8080
+      - 1935:1935
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
