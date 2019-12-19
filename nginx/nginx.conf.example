@@ -18,9 +18,10 @@ rtmp {
             live on;
 
             # Only publish to local network
-            allow publish 127.0.0.1;
-            allow publish $X_DOCKER_IP;
-            deny publish all;
+            #allow publish 127.0.0.1;
+            #allow publish $X_DOCKER_IP;
+            #deny publish all;
+            allow publish all;
 
             # Record
             recorder video {
@@ -115,7 +116,7 @@ http {
     }
 
     server {
-        listen 80;
+        listen 8081;
 
         add_header Cache-Control no-cache;
         add_header Access-Control-Allow-Origin * always;
