@@ -18,10 +18,9 @@ rtmp {
             live on;
 
             # Only publish to local network
-            #allow publish 127.0.0.1;
             #allow publish $X_DOCKER_IP;
-            #deny publish all;
             allow publish all;
+            #deny publish all;
 
             # Record
             recorder video {
@@ -57,8 +56,9 @@ rtmp {
         application hls {
             live on;
 
-            allow publish 127.0.0.1;
-            deny publish all;
+            #allow publish $X_DOCKER_IP;
+            #deny publish all;
+            allow publish all;
             deny play all;
 
             hls on;
