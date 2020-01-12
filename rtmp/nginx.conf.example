@@ -25,23 +25,23 @@ rtmp {
             # Record
             recorder video {
                 record all;
-                record_path /tmp/stream/rec/video;
+                record_path $X_STORAGE_MOUNT/rec/video;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
-                exec_record_done ffmpeg -i $path -f mp4 /var/www/video/$basename.mp4;
+                exec_record_done ffmpeg -i $path -f mp4 $X_STORAGE_MOUNT/video/$basename.mp4;
             }
 
             recorder audio {
                 record audio;
-                record_path /tmp/stream/rec/audio;
+                record_path $X_STORAGE_MOUNT/rec/audio;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
-                exec_record_done ffmpeg -i $path -q:a 5 /var/www/audio/$basename.mp3;
+                exec_record_done ffmpeg -i $path -q:a 5 $X_STORAGE_MOUNT/audio/$basename.mp3;
             }
 
             # DASH
             dash on;
-            dash_path /tmp/stream/dash;
+            dash_path $X_STORAGE_MOUNT/dash;
             dash_nested on;
             dash_fragment 15s;
 
@@ -62,7 +62,7 @@ rtmp {
             deny play all;
 
             hls on;
-            hls_path /tmp/stream/hls;
+            hls_path $X_STORAGE_MOUNT/hls;
             hls_nested on;
             hls_fragment 10s;
             hls_playlist_length 30s;
@@ -75,36 +75,18 @@ rtmp {
     }
 }
 
-# HTTP can be used for accessing RTMP stats
 http {
     server {
-        listen 8080;
+
+        listen 8081;
+        server_name nginx-rtmp;
 
         add_header Cache-Control no-cache;
         add_header Access-Control-Allow-Origin * always;
 
-        location /stream {
-            types {
-                application/x-mpegURL m3u8;
-                application/dash+xml mpd;
-                video/MP2T ts;
-                video/mp4 mp4;
-                audio/aac aac;
-            }
-            alias /tmp/stream/;
-        }
-
-        location /video {
-            alias /var/www/video;
-            autoindex on;
-        }
-
-        location /audio {
-            alias /var/www/audio;
-            autoindex on;
-        }
-
-        location /stat {
+        location /stats {
+            #auth_basic Admin;
+            #auth_basic_user_file /etc/admin.pass;
             root /usr/local/nginx/html/;
             rtmp_stat all;
             rtmp_stat_stylesheet stat.xsl;
@@ -112,19 +94,6 @@ http {
 
         location /stat.xsl {
             root /usr/local/nginx/html/;
-        }
-    }
-
-    server {
-        listen 8081;
-
-        add_header Cache-Control no-cache;
-        add_header Access-Control-Allow-Origin * always;
-
-        root /var/www;
-
-        location / {
-            index player.html;
         }
     }
 }

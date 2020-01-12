@@ -1,3 +1,9 @@
 FROM haproxy:latest
 
+# To use sockets for stats...
+# echo "show stat" | socat /run/haproxy/haproxy.sock stdio
+RUN mkdir -p /run/haproxy/
+RUN apt update
+RUN apt install -y socat less
+
 COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg

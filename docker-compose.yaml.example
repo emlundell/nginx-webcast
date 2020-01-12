@@ -12,7 +12,7 @@ services:
     networks:
       - net
     volumes:
-      - data-volume:/tmp/stream
+      - data-volume:$X_STORAGE_MOUNT
 
   rtmp:
     container_name: rtmp
@@ -26,7 +26,7 @@ services:
     networks:
       - net
     volumes:
-      - data-volume:/tmp/stream
+      - data-volume:$X_STORAGE_MOUNT
 
   loadbalancer:
     container_name: loadbalancer

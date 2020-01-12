@@ -1,0 +1,16 @@
+FROM tiangolo/nginx-rtmp
+
+RUN apt update
+RUN apt install -y \
+        ffmpeg \
+        tree
+
+RUN mkdir -p $X_STORAGE_MOUNT/video $X_STORAGE_MOUNT/audio $X_STORAGE_MOUNT/rec/video $X_STORAGE_MOUNT/rec/audio
+
+COPY stat.xsl /usr/local/nginx/html/stat.xsl
+COPY nginx.conf /etc/nginx/nginx.conf
+
+RUN chown -R www-data:www-data $X_STORAGE_MOUNT/ && chmod -R o+x $X_STORAGE_MOUNT/
+
+COPY restricted.pass /etc/restricted.pass
+COPY admin.pass /etc/admin.pass

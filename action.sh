@@ -14,8 +14,14 @@ for arg; do
 
     echo "Building docker with network '$X_DOCKER_IP'"
 
-    envsubst '$X_DOCKER_IP' < ./nginx/nginx.conf.example > ./nginx/nginx.conf
-    envsubst '$X_DOCKER_IP' < ./nginx/player.html.example > ./nginx/player.html
+    envsubst '$X_DOCKER_IP,$X_STORAGE_MOUNT' < ./web/nginx.conf.example > ./web/nginx.conf
+    envsubst '$X_DOCKER_IP' < ./web/player.html.example > ./web/player.html
+    envsubst '$X_STORAGE_MOUNT' < ./web/dockerfile.example > ./web/dockerfile
+
+    envsubst '$X_DOCKER_IP,$X_STORAGE_MOUNT' < ./rtmp/nginx.conf.example > ./rtmp/nginx.conf
+    envsubst '$X_STORAGE_MOUNT' < ./rtmp/dockerfile.example > ./rtmp/dockerfile
+
+    envsubst '$X_STORAGE_MOUNT' < ./docker-compose.yaml.example > ./docker-compose.yaml
 
     docker-compose build
 
