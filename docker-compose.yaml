@@ -12,7 +12,7 @@ services:
     networks:
       - net
     volumes:
-      - data-volume:/tmp/stream
+      - shared:/tmp
 
   rtmp:
     container_name: rtmp
@@ -22,11 +22,11 @@ services:
     image: webcast-rtmp:latest
     expose:
       - 1935
-      - 8081
+      - 8080
     networks:
       - net
     volumes:
-      - data-volume:/tmp/stream
+      - shared:/tmp
 
   loadbalancer:
     container_name: loadbalancer
@@ -37,15 +37,46 @@ services:
     depends_on:
       - web
       - rtmp
+      - grafana
     environment:
       - BALANCE=leastconn
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
       - 1935:1935
       - 1936:1936
-      - 8081:8081
+      - 8080:8080
+      - 3000:3000
+    networks:
+      - net
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/tmp/loki.yaml
+    depends_on:
+      - promtail
+    expose:
+      - 3001
+    volumes:
+      - shared:/tmp
+    networks:
+      - net
+
+  promtail:
+    image: grafana/promtail:latest
+    command: -config.file=/tmp/promtail.yaml
+    expose:
+      - 3001
+    volumes:
+      - shared:/tmp
+    networks:
+      - net
+
+  grafana:
+    image: grafana/grafana:master
+    depends_on:
+      - loki
+    expose:
+      - 3000
     networks:
       - net
 
@@ -54,4 +85,9 @@ networks:
     driver: bridge
 
 volumes:
-  data-volume:
+  shared:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "${PWD}/tmp"

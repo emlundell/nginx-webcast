@@ -14,15 +14,9 @@ for arg; do
 
     echo "Building docker with network '$X_DOCKER_IP'"
 
-    envsubst '$X_DOCKER_IP,$X_STORAGE_MOUNT' < ./web/nginx.conf.example > ./web/nginx.conf
+    envsubst '$X_DOCKER_IP' < ./web/nginx.conf.example > ./web/nginx.conf
     envsubst '$X_DOCKER_IP' < ./web/player.html.example > ./web/player.html
-    envsubst '$X_STORAGE_MOUNT' < ./web/dockerfile.example > ./web/dockerfile
-
-    envsubst '$X_DOCKER_IP,$X_STORAGE_MOUNT' < ./rtmp/nginx.conf.example > ./rtmp/nginx.conf
-    envsubst '$X_STORAGE_MOUNT' < ./rtmp/dockerfile.example > ./rtmp/dockerfile
-
-    envsubst '$X_STORAGE_MOUNT' < ./docker-compose.yaml.example > ./docker-compose.yaml
-
+    envsubst '$X_DOCKER_IP' < ./rtmp/nginx.conf.example > ./rtmp/nginx.conf
     docker-compose build
 
   elif [[ $arg == 'start' ]]; then

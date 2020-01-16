@@ -25,23 +25,23 @@ rtmp {
             # Record
             recorder video {
                 record all;
-                record_path $X_STORAGE_MOUNT/rec/video;
+                record_path /tmp/stream/rec/video;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
-                exec_record_done ffmpeg -i $path -f mp4 $X_STORAGE_MOUNT/video/$basename.mp4;
+                exec_record_done ffmpeg -i $path -f mp4 /tmp/stream/video/$basename.mp4;
             }
 
             recorder audio {
                 record audio;
-                record_path $X_STORAGE_MOUNT/rec/audio;
+                record_path /tmp/stream/rec/audio;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
-                exec_record_done ffmpeg -i $path -q:a 5 $X_STORAGE_MOUNT/audio/$basename.mp3;
+                exec_record_done ffmpeg -i $path -q:a 5 /tmp/steam/audio/$basename.mp3;
             }
 
             # DASH
             dash on;
-            dash_path $X_STORAGE_MOUNT/dash;
+            dash_path /tmp/stream/dash;
             dash_nested on;
             dash_fragment 15s;
 
@@ -62,7 +62,7 @@ rtmp {
             deny play all;
 
             hls on;
-            hls_path $X_STORAGE_MOUNT/hls;
+            hls_path /tmp/stream/hls;
             hls_nested on;
             hls_fragment 10s;
             hls_playlist_length 30s;
@@ -78,7 +78,7 @@ rtmp {
 http {
     server {
 
-        listen 8081;
+        listen 8080;
         server_name nginx-rtmp;
 
         add_header Cache-Control no-cache;

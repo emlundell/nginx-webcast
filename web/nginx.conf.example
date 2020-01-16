@@ -8,6 +8,9 @@ events {
 
 # HTTP can be used for accessing RTMP stats
 http {
+
+    log_format streaming '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $connection';
+
     server {
         listen 80;
         server_name nginx-web;
@@ -21,6 +24,9 @@ http {
         }
 
         location /stream {
+            access_log /tmp/stream.log streaming;
+            access_log /var/log/nginx/access.log streaming;
+
             types {
                 application/x-mpegURL m3u8;
                 application/dash+xml mpd;
@@ -28,20 +34,20 @@ http {
                 video/mp4 mp4;
                 audio/aac aac;
             }
-            alias $X_STORAGE_MOUNT;
+            alias /tmp/stream;
         }
 
         location /video {
             #auth_basic “Restricted”;
             #auth_basic_user_file /etc/restricted.pass;
-            alias $X_STORAGE_MOUNT/video;
+            alias /tmp/stream/video;
             autoindex on;
         }
 
         location /audio {
             #auth_basic “Restricted”;
             #auth_basic_user_file /etc/restricted.pass;
-            alias $X_STORAGE_MOUNT/audio;
+            alias /tmp/stream/audio;
             autoindex on;
         }
     }

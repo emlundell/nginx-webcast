@@ -18,3 +18,5 @@
 !rtmp/admin.pass
 !haproxy/dockerfile
 !haproxy/haproxy.cfg
+!tmp/loki.yaml
+!tmp/promtail.yaml
