@@ -20,3 +20,4 @@
 !haproxy/haproxy.cfg
 !tmp/loki.yaml
 !tmp/promtail.yaml
+!tmp/configs

@@ -51,22 +51,21 @@ services:
 
   loki:
     image: grafana/loki:latest
-    command: -config.file=/tmp/loki.yaml
+    command: -config.file=/configs/loki.yaml
     depends_on:
       - promtail
     expose:
-      - 3001
+      - 3100
     volumes:
-      - shared:/tmp
+      - configs:/configs
     networks:
       - net
 
   promtail:
     image: grafana/promtail:latest
-    command: -config.file=/tmp/promtail.yaml
-    expose:
-      - 3001
+    command: -config.file=/configs/promtail.yaml
     volumes:
+      - configs:/configs
       - shared:/tmp
     networks:
       - net
@@ -90,4 +89,10 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: "${PWD}/tmp"
+      device: "${PWD}/tmp/shared"
+  configs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "${PWD}/tmp/configs"
