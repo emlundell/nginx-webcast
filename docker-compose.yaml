@@ -9,10 +9,9 @@ services:
     image: webcast-web:latest
     expose:
       - 80
+      - 22
     networks:
       - net
-    volumes:
-      - shared:/tmp
 
   rtmp:
     container_name: rtmp
@@ -20,13 +19,20 @@ services:
       context: ./rtmp
       dockerfile: dockerfile
     image: webcast-rtmp:latest
+    depends_on:
+      - web
     expose:
       - 1935
       - 8080
+      - 22
     networks:
       - net
-    volumes:
-      - shared:/tmp
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - /dev/fuse:/dev/fuse
+    security_opt:
+      - apparmor:unconfined
 
   loadbalancer:
     container_name: loadbalancer
@@ -37,7 +43,6 @@ services:
     depends_on:
       - web
       - rtmp
-      - grafana
     environment:
       - BALANCE=leastconn
     ports:
@@ -49,50 +54,6 @@ services:
     networks:
       - net
 
-  loki:
-    image: grafana/loki:latest
-    command: -config.file=/configs/loki.yaml
-    depends_on:
-      - promtail
-    expose:
-      - 3100
-    volumes:
-      - configs:/configs
-    networks:
-      - net
-
-  promtail:
-    image: grafana/promtail:latest
-    command: -config.file=/configs/promtail.yaml
-    volumes:
-      - configs:/configs
-      - shared:/tmp
-    networks:
-      - net
-
-  grafana:
-    image: grafana/grafana:master
-    depends_on:
-      - loki
-    expose:
-      - 3000
-    networks:
-      - net
-
 networks:
   net:
     driver: bridge
-
-volumes:
-  shared:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: "${PWD}/tmp/shared"
-  configs:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: "${PWD}/tmp/configs"

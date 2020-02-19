@@ -1,5 +1,6 @@
 
-user www-data www-data;
+daemon off;
+user stream;
 
 # https://stackoverflow.com/a/56631458
 events {
@@ -25,23 +26,23 @@ rtmp {
             # Record
             recorder video {
                 record all;
-                record_path /tmp/stream/rec/video;
+                record_path /home/stream/media/rec/video;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
-                exec_record_done ffmpeg -i $path -f mp4 /tmp/stream/video/$basename.mp4;
+                exec_record_done ffmpeg -i $path -f mp4 /home/stream/media/video/$basename.mp4;
             }
 
             recorder audio {
                 record audio;
-                record_path /tmp/stream/rec/audio;
+                record_path /home/stream/media/rec/audio;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
-                exec_record_done ffmpeg -i $path -q:a 5 /tmp/steam/audio/$basename.mp3;
+                exec_record_done ffmpeg -i $path -q:a 5 /home/steam/media/audio/$basename.mp3;
             }
 
             # DASH
             dash on;
-            dash_path /tmp/stream/dash;
+            dash_path /home/stream/media/dash;
             dash_nested on;
             dash_fragment 15s;
 
@@ -62,7 +63,7 @@ rtmp {
             deny play all;
 
             hls on;
-            hls_path /tmp/stream/hls;
+            hls_path /home/stream/media/hls;
             hls_nested on;
             hls_fragment 10s;
             hls_playlist_length 30s;
@@ -75,25 +76,25 @@ rtmp {
     }
 }
 
-http {
-    server {
-
-        listen 8080;
-        server_name nginx-rtmp;
-
-        add_header Cache-Control no-cache;
-        add_header Access-Control-Allow-Origin * always;
-
-        location /stats {
-            #auth_basic Admin;
-            #auth_basic_user_file /etc/admin.pass;
-            root /usr/local/nginx/html/;
-            rtmp_stat all;
-            rtmp_stat_stylesheet stat.xsl;
-        }
-
-        location /stat.xsl {
-            root /usr/local/nginx/html/;
-        }
-    }
-}
+#http {
+#    server {
+#
+#        listen 8080;
+#        server_name nginx-rtmp;
+#
+#        add_header Cache-Control no-cache;
+#        add_header Access-Control-Allow-Origin * always;
+#
+#        location /stats {
+#            #auth_basic Admin;
+#            #auth_basic_user_file /etc/admin.pass;
+#            root /usr/local/nginx/html/;
+#            rtmp_stat all;
+#            rtmp_stat_stylesheet stat.xsl;
+#        }
+#
+#        location /stat.xsl {
+#            root /usr/local/nginx/html/;
+#        }
+#    }
+#}

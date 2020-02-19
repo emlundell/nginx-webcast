@@ -1,5 +1,6 @@
 
-user www-data www-data;
+daemon off;
+user www-data;
 
 # https://stackoverflow.com/a/56631458
 events {
@@ -34,20 +35,20 @@ http {
                 video/mp4 mp4;
                 audio/aac aac;
             }
-            alias /tmp/stream;
+            alias /home/stream/media/;
         }
 
         location /video {
             #auth_basic “Restricted”;
             #auth_basic_user_file /etc/restricted.pass;
-            alias /tmp/stream/video;
+            alias /home/stream/media/video;
             autoindex on;
         }
 
         location /audio {
             #auth_basic “Restricted”;
             #auth_basic_user_file /etc/restricted.pass;
-            alias /tmp/stream/audio;
+            alias /home/stream/media/audio;
             autoindex on;
         }
     }
