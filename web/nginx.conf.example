@@ -1,6 +1,6 @@
 
 daemon off;
-user www-data;
+user stream www-data;
 
 # https://stackoverflow.com/a/56631458
 events {
@@ -35,7 +35,7 @@ http {
                 video/mp4 mp4;
                 audio/aac aac;
             }
-            alias /home/stream/media/;
+            alias /home/stream/media/stream/;
         }
 
         location /video {

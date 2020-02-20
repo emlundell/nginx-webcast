@@ -1,6 +1,6 @@
 
 daemon off;
-user stream;
+user stream www-data;
 
 # https://stackoverflow.com/a/56631458
 events {
@@ -26,7 +26,7 @@ rtmp {
             # Record
             recorder video {
                 record all;
-                record_path /home/stream/media/rec/video;
+                record_path /home/stream/media/rec_video;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
                 exec_record_done ffmpeg -i $path -f mp4 /home/stream/media/video/$basename.mp4;
@@ -34,15 +34,15 @@ rtmp {
 
             recorder audio {
                 record audio;
-                record_path /home/stream/media/rec/audio;
+                record_path /home/stream/media/rec_audio;
                 record_unique on;
                 record_suffix -%d-%b-%y-%T.flv;
-                exec_record_done ffmpeg -i $path -q:a 5 /home/steam/media/audio/$basename.mp3;
+                exec_record_done ffmpeg -i $path -q:a 5 /home/stream/media/audio/$basename.mp3;
             }
 
             # DASH
             dash on;
-            dash_path /home/stream/media/dash;
+            dash_path /home/stream/media/stream/dash;
             dash_nested on;
             dash_fragment 15s;
 
@@ -63,7 +63,7 @@ rtmp {
             deny play all;
 
             hls on;
-            hls_path /home/stream/media/hls;
+            hls_path /home/stream/media/stream/hls;
             hls_nested on;
             hls_fragment 10s;
             hls_playlist_length 30s;
