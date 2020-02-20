@@ -13,6 +13,8 @@ rtmp {
 
         chunk_size 4096;
 
+        #access_log /var/log/nginx/access.log;
+
         application stream {
 
             # enable live streaming

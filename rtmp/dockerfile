@@ -1,0 +1,25 @@
+FROM tiangolo/nginx-rtmp
+
+RUN apt update
+RUN apt install -y \
+        ffmpeg \
+        tree \
+        sshfs
+
+COPY stat.xsl /usr/local/nginx/html/stat.xsl
+COPY nginx.conf /etc/nginx/nginx.conf
+
+COPY restricted.pass /etc/restricted.pass
+COPY admin.pass /etc/admin.pass
+
+COPY id_rsa* /root/.ssh/
+RUN chmod 700 /root/.ssh && chmod 600 /root/.ssh/id_rsa* && \
+  echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config && \
+  echo "IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config && \
+  echo "PasswordAuthentication no" >> /etc/ssh/ssh_config && \
+  useradd -ms /bin/bash stream && \
+  mkdir -p /home/stream/media/
+
+COPY ./cmd.sh /usr/local/bin/cmd.sh
+RUN chmod 755 /usr/local/bin/cmd.sh
+CMD /usr/local/bin/cmd.sh
