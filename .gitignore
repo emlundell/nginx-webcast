@@ -12,12 +12,14 @@
 !web/restricted.pass
 !web/admin.pass
 !web/cmd.sh
+!web/syslog-ng.conf
 !rtmp/dockerfile
 !rtmp/nginx.conf.example
 !rtmp/stat.xsl
 !rtmp/restricted.pass
 !rtmp/admin.pass
 !rtmp/cmd.sh
+!rtmp/syslog-ng.conf
 !haproxy/dockerfile
 !haproxy/haproxy.cfg
 !tmp/loki.yaml

@@ -22,7 +22,12 @@ for arg; do
     envsubst '$X_DOCKER_IP' < ./web/nginx.conf.example > ./web/nginx.conf
     envsubst '$X_DOCKER_IP' < ./web/player.html.example > ./web/player.html
     envsubst '$X_DOCKER_IP' < ./rtmp/nginx.conf.example > ./rtmp/nginx.conf
-    docker-compose build
+
+    # docker-compose doesn't cache image layers. So build the images outside
+    #docker-compose build
+    docker build -f ./rtmp/dockerfile -t webcast-rtmp:latest ./rtmp/
+    docker build -f ./web/dockerfile -t webcast-web:latest ./web/
+    docker build -f ./haproxy/dockerfile -t webcast-haproxy:latest ./haproxy/
 
   elif [[ $arg == 'start' ]]; then
 

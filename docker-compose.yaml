@@ -3,21 +3,16 @@ version: '3'
 services:
   web:
     container_name: web
-    build:
-      context: ./web
-      dockerfile: dockerfile
     image: webcast-web:latest
     expose:
       - 80
       - 22
+      - 2010
     networks:
       - net
 
   rtmp:
     container_name: rtmp
-    build:
-      context: ./rtmp
-      dockerfile: dockerfile
     image: webcast-rtmp:latest
     depends_on:
       - web
@@ -25,6 +20,7 @@ services:
       - 1935
       - 8080
       - 22
+      - 2010
     networks:
       - net
     cap_add:
@@ -36,9 +32,6 @@ services:
 
   loadbalancer:
     container_name: loadbalancer
-    build:
-      context: ./haproxy
-      dockerfile: dockerfile
     image: webcast-haproxy:latest
     depends_on:
       - web

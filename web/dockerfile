@@ -1,7 +1,8 @@
 FROM tiangolo/nginx-rtmp
 
-RUN apt update
-RUN apt install -y \
+RUN apt update && \
+  apt install -y \
+        syslog-ng \
         ffmpeg \
         tree \
         openssh-server
@@ -31,3 +32,5 @@ RUN chown -R stream:www-data /var/www/ && chmod -R o+x /var/www/ && \
 COPY ./cmd.sh /usr/local/bin/cmd.sh
 RUN chmod 755 /usr/local/bin/cmd.sh
 CMD /usr/local/bin/cmd.sh
+
+COPY syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
