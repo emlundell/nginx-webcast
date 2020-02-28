@@ -4,7 +4,7 @@ RUN apt update && \
   apt install -y \
         ffmpeg \
         syslog-ng \
-        sshfs
+        sshfs #net-tools
 
 COPY stat.xsl /usr/local/nginx/html/stat.xsl
 COPY nginx.conf /etc/nginx/nginx.conf

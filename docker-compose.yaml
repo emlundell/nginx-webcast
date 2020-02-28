@@ -7,7 +7,7 @@ services:
     expose:
       - 80
       - 22
-      - 2010
+      - 5140
     networks:
       - net
 
@@ -20,7 +20,7 @@ services:
       - 1935
       - 8080
       - 22
-      - 2010
+      - 5140
     networks:
       - net
     cap_add:

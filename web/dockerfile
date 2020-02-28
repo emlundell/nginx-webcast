@@ -5,7 +5,7 @@ RUN apt update && \
         syslog-ng \
         ffmpeg \
         tree \
-        openssh-server
+        openssh-server #net-tools
 
 COPY stat.xsl /usr/local/nginx/html/stat.xsl
 COPY nginx.conf /etc/nginx/nginx.conf
