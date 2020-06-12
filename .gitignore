@@ -1,10 +1,15 @@
-*/*
+*
+
 !.gitignore
 !LICENSE
 !README.md
 !action.env
 !action.sh
-!docker-compose.yaml.example
+!docker-compose.yaml
+
+!rtmp_nginx_20_04/build.sh
+!rtmp_nginx_20_04/dockerfile
+
 !web/dockerfile
 !web/nginx.conf.example
 !web/player.html.example
@@ -13,6 +18,7 @@
 !web/admin.pass
 !web/cmd.sh
 !web/syslog-ng.conf
+
 !rtmp/dockerfile
 !rtmp/nginx.conf.example
 !rtmp/stat.xsl
@@ -20,8 +26,6 @@
 !rtmp/admin.pass
 !rtmp/cmd.sh
 !rtmp/syslog-ng.conf
+
 !haproxy/dockerfile
 !haproxy/haproxy.cfg
-!tmp/loki.yaml
-!tmp/promtail.yaml
-!tmp/configs

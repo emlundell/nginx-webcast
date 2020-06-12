@@ -13,7 +13,7 @@ rtmp {
 
         chunk_size 4096;
 
-        #access_log /var/log/nginx/access.log;
+        access_log /var/log/nginx/access.log;
 
         application stream {
 
@@ -78,25 +78,32 @@ rtmp {
     }
 }
 
-#http {
-#    server {
-#
-#        listen 8080;
-#        server_name nginx-rtmp;
-#
-#        add_header Cache-Control no-cache;
-#        add_header Access-Control-Allow-Origin * always;
-#
-#        location /stats {
-#            #auth_basic Admin;
-#            #auth_basic_user_file /etc/admin.pass;
-#            root /usr/local/nginx/html/;
-#            rtmp_stat all;
-#            rtmp_stat_stylesheet stat.xsl;
-#        }
-#
-#        location /stat.xsl {
-#            root /usr/local/nginx/html/;
-#        }
-#    }
-#}
+http {
+    server {
+
+        listen 8080;
+        server_name nginx-rtmp-stats;
+
+        add_header Cache-Control no-cache;
+        add_header Access-Control-Allow-Origin * always;
+
+        location /rtmp-stats {
+            stub_status;
+        }
+
+        location /rtmp-stats-raw {
+            root /usr/local/nginx/html/;
+            rtmp_stat all;
+        }
+
+        location /rtmp-stats-xsl {
+            root /usr/local/nginx/html/;
+            rtmp_stat all;
+            rtmp_stat_stylesheet stat.xsl;
+        }
+
+        location /stat.xsl {
+            root /usr/local/nginx/html/;
+        }
+    }
+}

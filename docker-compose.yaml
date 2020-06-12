@@ -6,6 +6,7 @@ services:
     image: webcast-web:latest
     expose:
       - 80
+      - 8080
       - 22
       - 5140
     networks:
@@ -41,9 +42,7 @@ services:
     ports:
       - 80:80
       - 1935:1935
-      - 1936:1936
       - 8080:8080
-      - 3000:3000
     networks:
       - net
 

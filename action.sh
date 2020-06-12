@@ -4,7 +4,7 @@
 
 # Export enviroment vars set in action.conf
 # https://unix.stackexchange.com/a/79077
-set -a
+set -ae
 . ./action.env
 set +a
 
@@ -23,8 +23,10 @@ for arg; do
     envsubst '$X_DOCKER_IP' < ./web/player.html.example > ./web/player.html
     envsubst '$X_DOCKER_IP' < ./rtmp/nginx.conf.example > ./rtmp/nginx.conf
 
+    cd ./nginx_rtmp_20.04/ && bash build.sh && cd ..
+
     # docker-compose doesn't cache image layers. So build the images outside
-    #docker-compose build
+    docker build -f ./rtmp_nginx_20_04/dockerfile -t rtmp-nginx-20.04:latest ./rtmp_nginx_20_04
     docker build -f ./rtmp/dockerfile -t webcast-rtmp:latest ./rtmp/
     docker build -f ./web/dockerfile -t webcast-web:latest ./web/
     docker build -f ./haproxy/dockerfile -t webcast-haproxy:latest ./haproxy/

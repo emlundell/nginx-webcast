@@ -10,9 +10,9 @@ events {
 # HTTP can be used for accessing RTMP stats
 http {
 
-    #log_format streaming '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $connection';
-    #access_log /var/log/nginx/access.log streaming;
-    #error_log /var/log/nginx/error.log streaming;
+    log_format streaming '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $connection';
+    access_log /var/log/nginx/access.log streaming;
+    error_log /var/log/nginx/error.log error;
 
     server {
         listen 80;
@@ -49,6 +49,19 @@ http {
             #auth_basic_user_file /etc/restricted.pass;
             alias /home/stream/media/audio;
             autoindex on;
+        }
+    }
+
+    server {
+
+        listen 8080;
+        server_name nginx-web-stats;
+
+        add_header Cache-Control no-cache;
+        add_header Access-Control-Allow-Origin * always;
+
+        location /web-stats {
+            stub_status;
         }
     }
 }
