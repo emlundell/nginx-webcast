@@ -19,7 +19,6 @@
 !web/cmd.sh
 !web/syslog-ng.conf
 !web/parse_db.py
-!web/*
 
 !rtmp/dockerfile
 !rtmp/nginx.conf.example
