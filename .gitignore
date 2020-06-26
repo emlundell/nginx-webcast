@@ -18,7 +18,7 @@
 !web/admin.pass
 !web/cmd.sh
 !web/syslog-ng.conf
-!web/parse_db.py
+!web/parse_db.py   
 
 !rtmp/dockerfile
 !rtmp/nginx.conf.example
