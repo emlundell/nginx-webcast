@@ -37,36 +37,39 @@ class Parse:
 
         self.all_days = self._fill_in_days(start_day, end_day)
 
-    def _fill_in_days(self, start_day: str, end_day: str) -> List(str):
+    def _fill_in_days(self, start_day: str, end_day: str) -> List[str]:
 
         end_day = end_day or start_day
 
-        start_day_dt = datetime.datetime.strptime(start_day, "%Y-%M-%D")
-        end_day_dt = datetime.datetime.strptime(end_day, "%Y-%M-%D")
+        start_day_dt = datetime.datetime.strptime(start_day, "%Y-%M-%d")
+        end_day_dt = datetime.datetime.strptime(end_day, "%Y-%M-%d")
 
         if start_day_dt > end_day_dt:
             end_day_dt, start_day_dt = start_day_dt, end_day_dt
 
         delta = end_day_dt - start_day_dt
         dd = [start_day_dt + datetime.timedelta(days=x) for x in range(delta.days + 1)]
-        days = [datetime.datetime.strftime(d, "%Y-%M-%D") for d in dd]
+        days = [datetime.datetime.strftime(d, "%Y-%M-%d") for d in dd]
+        print(f"days filled in {days}")
         return days
 
     def _get_log_file_names(self) -> str:
 
         logfiles = []
-        for date in self.all_days():
+        for date in self.all_days:
             if os.path.exists(f"{self.log_file_path}syslog-{date}.log"):
-                logfiles.append(f"syslog-{date}.log")
+                logfiles.append(f"{self.log_file_path}syslog-{date}.log")
             elif os.path.exists(f"{self.log_file_path}syslog-{date}.log.zip"):
-                logfiles.append(f"syslog-{date}.log.zip")
+                logfiles.append(f"{self.log_file_path}syslog-{date}.log.zip")
 
+        print(f"Logs to be parsed: {logfiles}")
         return logfiles
 
     def _create_db(self):
         try:
             c = self.conn.cursor()
             c.execute("CREATE TABLE stream (inserted date, ip text, uri text)")
+            print("Table stream created.")
         except:
             print("Table stream already exists. Skipping creation...")
 
@@ -123,9 +126,9 @@ class Parse:
 
                     line = m.readline()
 
-    def get_connections_per_stream(self) -> List(Tuple(int, str)):
+    def get_connections_per_stream(self) -> List[Tuple[int, str]]:
         # Open DB and parse per stream, returning connections per stream
-        pass
+        print("Inside get_connections_per_stream. Not implmenented...")
 
 def parse_db(start_day, end_day):
 
@@ -137,7 +140,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("start_day", help='2020-06-22')
-    parser.add_argument("end_day", help='2020-06-23')
+    parser.add_argument("end_day", nargs="?", help='2020-06-23')
     args = parser.parse_args() 
 
     connections_per_stream  = parse_db(args.start_day, args.end_day)
