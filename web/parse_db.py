@@ -80,35 +80,13 @@ class Parse:
 
     def parse_log_to_db(self):
         
-        '''
-        a = re.compile(r"""\d +  # the integral part
-            \.    # the decimal point
-            \d *  # some fractional digits""", re.X)
-        b = re.compile(r"\d+\.\d*")
-        '''
-        # TODO: Find regex for match
         """
         Jun 22 09:27:11 9bda909079bd 172.19.0.4 - - [22/Jun/2020:09:27:11 +0000] "GET /stream/hls/test_hi/index.m3u8 HTTP/1.1" 200 137 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
         Jun 22 09:27:20 9bda909079bd 172.19.0.4 - - [22/Jun/2020:09:27:19 +0000] "GET /stream/hls/test_audio/index.m3u8 HTTP/1.1" 200 138 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
         Jun 22 09:27:21 9bda909079bd 172.19.0.4 - - [22/Jun/2020:09:27:21 +0000] "GET /stream/hls/test_hi/5.ts HTTP/1.1" 200 1262796 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
         Jun 22 09:27:21 9bda909079bd 172.19.0.4 - - [22/Jun/2020:09:27:21 +0000] "GET /stream/hls/test_hi/6.ts HTTP/1.1" 200 931540 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
         """
-        comp_hls = re.compile(r"""
-            .*  # Jun 22 09:27:11 9bda909079bd 
-            ()  # 172.19.0.4
-            - -  # - -  
-            [()]  # [22/Jun/2020:09:27:21 +0000] 
-            \"GET  # "GET 
-            \/()  # /stream
-            \/()  # /hls
-            \/(.*_.*)  # /test_hi
-            \/*.ts  # /6.ts 
-            \"  # "
-            ()  # 200
-            ()  # 931540
-            .*$  # "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
-            """, re.X)
-
+        comp_hls = re.compile(r"^.* (\d\d\d\.\d\d\.\d\.\d) - - \[(.*)\] \"GET \/(.*)\/hls\/(.*_.*)\/(.*)\.ts HTTP\/1\.1\" (.*) (.*) \".*\" (.*)$")
         # Copy current syslog file to temp
         # This is to ensure that we don't block the file for system writing
         # Parse over time range, and add to DB
@@ -118,10 +96,10 @@ class Parse:
 
                 line = m.readline()
                 while line:
-                    res = comp_hls.match(line)
+                    res = comp_hls.match(line.decode("utf-8"))
                     if res:
                         # TODO: Ref proper groups
-                        tup = (res.group(99), res.group(99), res.group(99))
+                        tup = (res.group(99), res.group(2), res.group(3))
                         self._insert_line(tup)
 
                     line = m.readline()
@@ -138,10 +116,14 @@ def parse_db(start_day, end_day):
 
 if __name__ == "__main__":
 
+    import sys 
+    sys.argv = ['2020-06-27', '2020-06-27']
+
     parser = argparse.ArgumentParser()
     parser.add_argument("start_day", help='2020-06-22')
     parser.add_argument("end_day", nargs="?", help='2020-06-23')
-    args = parser.parse_args() 
+    args = parser.parse_args()
 
     connections_per_stream  = parse_db(args.start_day, args.end_day)
     print(connections_per_stream)
+
