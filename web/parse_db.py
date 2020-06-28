@@ -67,26 +67,25 @@ class Parse:
 
     def _create_db(self):
         try:
-            c = self.conn.cursor()
-            c.execute("CREATE TABLE stream (inserted date, ip text, uri text)")
-            print("Table stream created.")
+            with self.conn:
+                self.conn.execute("CREATE TABLE stream (inserted timestamp, ip text, stream text, conn int)")
+                print("Table stream created.")
         except:
             print("Table stream already exists. Skipping creation...")
 
     def _insert_line(self, values: Tuple):
         with self.conn:
-            c = self.conn.cursor()
-            c.execute("INSERT INTO stream VALUES (?,?,?)", values)
+            self.conn.execute("INSERT INTO stream VALUES (?,?,?,?)", values)
+    
+    def _get_num_unique_ip_per_minute(self):
+        with self.conn:
+            res = self.conn.execute("SELECT COUNT(DISTINCT ip), strftime('%Y-%m-%d %H:%M', inserted) FROM stream GROUP BY strftime('%Y-%m-%d %H:%M', inserted)")
+            return res.fetchall()
 
     def parse_log_to_db(self):
+        comp_hls = re.compile(r"^.* (\d\d\d\.\d\d\.\d\.\d) - - \[(.*)\] \"GET \/.*\/hls\/(.*_.*)\/(.*)\.ts HTTP\/1\.1\" (.*) (.*) \".*\" (.*) \"(.*)\"$")
+        comp_dash = re.compile(r"0js8d")
         
-        """
-        Jun 22 09:27:11 9bda909079bd 172.19.0.4 - - [22/Jun/2020:09:27:11 +0000] "GET /stream/hls/test_hi/index.m3u8 HTTP/1.1" 200 137 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
-        Jun 22 09:27:20 9bda909079bd 172.19.0.4 - - [22/Jun/2020:09:27:19 +0000] "GET /stream/hls/test_audio/index.m3u8 HTTP/1.1" 200 138 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
-        Jun 22 09:27:21 9bda909079bd 172.19.0.4 - - [22/Jun/2020:09:27:21 +0000] "GET /stream/hls/test_hi/5.ts HTTP/1.1" 200 1262796 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
-        Jun 22 09:27:21 9bda909079bd 172.19.0.4 - - [22/Jun/2020:09:27:21 +0000] "GET /stream/hls/test_hi/6.ts HTTP/1.1" 200 931540 "http://localhost/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0" 1
-        """
-        comp_hls = re.compile(r"^.* (\d\d\d\.\d\d\.\d\.\d) - - \[(.*)\] \"GET \/(.*)\/hls\/(.*_.*)\/(.*)\.ts HTTP\/1\.1\" (.*) (.*) \".*\" (.*)$")
         # Copy current syslog file to temp
         # This is to ensure that we don't block the file for system writing
         # Parse over time range, and add to DB
@@ -96,17 +95,34 @@ class Parse:
 
                 line = m.readline()
                 while line:
-                    res = comp_hls.match(line.decode("utf-8"))
-                    if res:
+                    res_hls = comp_hls.match(line.decode("utf-8"))
+                    if res_hls:
+                        # Ref proper groups
+                        # 1: container ip, 2: stream datetime, 3: stream name, 4: fragment number, 5: http code, 6: bytes, 7: connection number, 8: forward ip
+                        timestamp = datetime.datetime.strptime(res_hls.group(2), '%d/%b/%Y:%H:%M:%S +0000')
+                        tup = (
+                            timestamp, 
+                            res_hls.group(8), 
+                            res_hls.group(3),
+                            res_hls.group(7) 
+                            )
+                        self._insert_line(tup)
+
+                    res_dash = comp_dash.match(line.decode("utf-8"))
+                    if res_dash:
                         # TODO: Ref proper groups
-                        tup = (res.group(99), res.group(2), res.group(3))
+                        tup = (res_dash.group(99), res_dash.group(2), res_dash.group(3))
                         self._insert_line(tup)
 
                     line = m.readline()
 
     def get_connections_per_stream(self) -> List[Tuple[int, str]]:
-        # Open DB and parse per stream, returning connections per stream
-        print("Inside get_connections_per_stream. Not implmenented...")
+        # Open DB and parse per stream, returning connections per stream        
+        #with self.conn:
+        #    for row in self.conn.execute("SELECT * FROM stream"):
+        #        print(row)
+
+        return self._get_num_unique_ip_per_minute()
 
 def parse_db(start_day, end_day):
 
