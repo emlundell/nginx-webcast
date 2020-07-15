@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
 """
+    Given a date range, find the number of connections per stream.
+
+    The syslog file is parsed for some metadata and put into an sqlite3 memory DB. 
+    Then this DB is queried and the connections per stream is deduced. 
+    
+
     parse(start_day, end_day) => [(connections, stream_name)]
 
         start_day: "2020-06-22"

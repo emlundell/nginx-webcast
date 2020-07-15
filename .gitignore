@@ -7,15 +7,12 @@
 !action.sh
 !docker-compose.yaml
 
-!rtmp_nginx_20_04/build.sh
 !rtmp_nginx_20_04/dockerfile
 
 !web/dockerfile
 !web/nginx.conf.example
 !web/player.html.example
 !web/stat.xsl
-!web/restricted.pass
-!web/admin.pass
 !web/cmd.sh
 !web/syslog-ng.conf
 !web/parse_db.py   
@@ -23,8 +20,6 @@
 !rtmp/dockerfile
 !rtmp/nginx.conf.example
 !rtmp/stat.xsl
-!rtmp/restricted.pass
-!rtmp/admin.pass
 !rtmp/cmd.sh
 !rtmp/syslog-ng.conf
 

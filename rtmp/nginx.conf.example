@@ -21,9 +21,8 @@ rtmp {
             live on;
 
             # Only publish to local network
-            #allow publish $X_DOCKER_IP;
             allow publish all;
-            #deny publish all;
+            deny publish all;
 
             # Record
             recorder video {
@@ -59,8 +58,6 @@ rtmp {
         application hls {
             live on;
 
-            #allow publish $X_DOCKER_IP;
-            #deny publish all;
             allow publish all;
             deny play all;
 
@@ -87,6 +84,7 @@ http {
         add_header Cache-Control no-cache;
         add_header Access-Control-Allow-Origin * always;
 
+        # All of these ways to get the stats may not be needed.
         location /rtmp-stats {
             stub_status;
         }

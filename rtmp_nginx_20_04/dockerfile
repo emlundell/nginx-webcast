@@ -1,3 +1,8 @@
+# This dockerfile is based off https://github.com/tiangolo/nginx-rtmp-docker and https://github.com/arut/nginx-rtmp-module
+# It has been updated to ubuntu 20.04 and the stub status module
+# This also allows for other potential modules and allows for the latest versioj of syslog-ng to run
+# As a later comment notes, warnings are ignored. Otherwise the build would fail. This is not a long term solution.
+
 FROM ubuntu:20.04
 
 RUN apt update && \
@@ -53,14 +58,6 @@ RUN apt remove -y gcc \
         zlib1g-dev \
         make  && \
     apt autoremove -y
-
-# Forward logs to Docker
-# This might not be needed if syslog works
-#RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
-#    ln -sf /dev/stderr /var/log/nginx/error.log
-
-# Set up config file. We will use a later one
-#COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 1935
 CMD ["nginx", "-g", "daemon off;"]
