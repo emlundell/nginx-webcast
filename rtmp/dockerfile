@@ -19,6 +19,8 @@ RUN chmod 700 /root/.ssh && chmod 600 /root/.ssh/id_rsa* && \
   mkdir -p /home/stream/media/
 
 COPY syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
+# https://serverfault.com/questions/524518/error-setting-capabilities-capability-management-disabled
+RUN sed -i 's/#SYSLOGNG_OPTS/SYSLOGNG_OPTS/' /etc/default/syslog-ng
 
 COPY ./cmd.sh /usr/local/bin/cmd.sh
 RUN chmod 755 /usr/local/bin/cmd.sh
