@@ -1,0 +1,59 @@
+version: '3'
+
+# Port 80 is for the public webpage
+# Port 8080 is for public stats pages
+# Port 1935 is for public RTMP
+# Port 22 is for private SSHFS (for transfering audio and video) between rtmp and web
+# Port 5140 is for private syslog between rtmp and web
+
+services:
+  web:
+    container_name: web
+    image: webcast-web:latest
+    expose:
+      - 80
+      - 8080
+      - 22
+      - 5140
+    networks:
+      - private
+
+  rtmp:
+    container_name: rtmp
+    image: webcast-rtmp:latest
+    depends_on:
+      - web
+    expose:
+      - 1935
+      - 8080
+      - 22
+      - 5140
+    networks:
+      - private
+    # Capabilities and settings for SSHFS to work properly
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - /dev/fuse:/dev/fuse
+    security_opt:
+      - apparmor:unconfined
+
+  # The load balancer (haproxy) interfaces with the outside with web and rtmp
+  loadbalancer:
+    container_name: loadbalancer
+    image: webcast-haproxy:latest
+    depends_on:
+      - web
+      - rtmp
+    environment:
+      - BALANCE=leastconn
+    ports:
+      - 80:80
+      - 1935:1935
+      - 8080:8080
+    networks:
+      - private
+
+networks:
+  private:
+    driver: bridge

@@ -1,0 +1,63 @@
+# This dockerfile is based off https://github.com/tiangolo/nginx-rtmp-docker and https://github.com/arut/nginx-rtmp-module
+# It has been updated to ubuntu 20.04 and the stub status module
+# This also allows for other potential modules and allows for the latest versioj of syslog-ng to run
+# As a later comment notes, warnings are ignored. Otherwise the build would fail. This is not a long term solution.
+
+FROM ubuntu:20.04
+
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y ca-certificates \
+        openssl \
+        libssl-dev \
+        gcc \
+        libpcre3 \
+        libpcre3-dev \
+        zlib1g \
+        zlib1g-dev \
+        make && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY ./nginx.tar.gz /nginx.tar.gz
+COPY ./nginx-rtmp-module /nginx-rtmp-module
+
+RUN mkdir -p /tmp/build/nginx/nginx && \
+    mv /nginx.tar.gz /tmp/build/nginx/nginx.tar.gz && \
+    cd /tmp/build/nginx && \
+    tar -zxf nginx.tar.gz -C nginx --strip-components=1
+
+RUN mkdir -p /tmp/build/nginx-rtmp-module && \
+    cd /tmp/build/nginx-rtmp-module && \
+    mv /nginx-rtmp-module /tmp/build/nginx-rtmp-module/nginx-rtmp-module
+ 
+# Build and install Nginx
+# The default puts everything under /usr/local/nginx, so it's needed to change
+# it explicitly. Not just for order but to have it in the PATH
+# WARNING: CFLAGS=-Wno-error set to ignore warnings. This is not good for the long term.
+RUN cd /tmp/build/nginx/nginx && \
+    CFLAGS=-Wno-error ./configure \
+        --with-http_stub_status_module \
+        --sbin-path=/usr/local/sbin/nginx \
+        --conf-path=/etc/nginx/nginx.conf \
+        --error-log-path=/var/log/nginx/error.log \
+        --pid-path=/var/run/nginx/nginx.pid \
+        --lock-path=/var/lock/nginx/nginx.lock \
+        --http-log-path=/var/log/nginx/access.log \
+        --http-client-body-temp-path=/tmp/nginx-client-body \
+        --with-http_ssl_module \
+        --with-threads \
+        --with-ipv6 \
+        --add-module=/tmp/build/nginx-rtmp-module/nginx-rtmp-module && \
+    make -j $(getconf _NPROCESSORS_ONLN) && \
+    make install && \
+    mkdir /var/lock/nginx && \
+    rm -rf /tmp/build
+
+RUN apt remove -y gcc \
+        libpcre3-dev \
+        zlib1g-dev \
+        make  && \
+    apt autoremove -y
+
+EXPOSE 1935
+CMD ["nginx", "-g", "daemon off;"]

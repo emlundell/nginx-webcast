@@ -1,0 +1,13 @@
+**
+
+!.gitignore
+!LICENSE
+!README.md
+!action.env
+!action.sh
+!docker-compose.yaml
+
+!rtmp_nginx_20_04/
+!rtmp/
+!web/
+!haproxy/

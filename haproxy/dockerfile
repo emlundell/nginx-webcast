@@ -1,0 +1,12 @@
+FROM haproxy:latest
+
+# To use sockets for stats testing...
+# echo "show stat" | socat /run/haproxy/haproxy.sock stdio
+
+RUN apt update && \
+  apt install -y \
+    socat \
+    less
+
+RUN mkdir -p /run/haproxy/
+COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg

@@ -1,0 +1,10 @@
+**
+
+!.gitignore
+!dockerfile
+!nginx.conf
+!player.html.example
+!stat.xsl
+!cmd.sh
+!syslog-ng.conf
+!parse_db.py  

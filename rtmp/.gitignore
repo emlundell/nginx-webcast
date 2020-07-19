@@ -1,0 +1,8 @@
+**
+
+!.gitignore
+!dockerfile
+!nginx.conf
+!stat.xsl
+!cmd.sh
+!syslog-ng.conf
