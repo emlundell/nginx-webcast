@@ -32,8 +32,17 @@ import datetime
 import argparse 
 import os
 import logging
+import sys
 
 log = logging.getLogger(__file__)
+logging.basicConfig(
+    level=logging.ERROR,
+    format=f"{__file__} [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("/var/log/scripts.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
 class Parse:
 
@@ -50,16 +59,16 @@ class Parse:
 
         end_day = end_day or start_day
 
-        start_day_dt = datetime.datetime.strptime(start_day, "%Y-%M-%d")
-        end_day_dt = datetime.datetime.strptime(end_day, "%Y-%M-%d")
+        start_day_dt = datetime.datetime.strptime(start_day, "%Y-%m-%d")
+        end_day_dt = datetime.datetime.strptime(end_day, "%Y-%m-%d")
 
         if start_day_dt > end_day_dt:
             end_day_dt, start_day_dt = start_day_dt, end_day_dt
 
         delta = end_day_dt - start_day_dt
         dd = [start_day_dt + datetime.timedelta(days=x) for x in range(delta.days + 1)]
-        days = [datetime.datetime.strftime(d, "%Y-%M-%d") for d in dd]
-        logging.debug(f"days filled in {days}")
+        days = [datetime.datetime.strftime(d, "%Y-%m-%d") for d in dd]
+        log.debug(f"days filled in {days}")
         return days
 
     def _get_log_file_names(self) -> str:
@@ -92,10 +101,9 @@ class Parse:
             return res.fetchall()
 
     def parse_log_to_db(self):
-        comp_hls = re.compile(r"^.* (\d\d\d\.\d\d\.\d\.\d) - - \[(.*)\] \"GET \/.*\/hls\/(.*_.*)\/(.*)\.ts HTTP\/1\.1\" (.*) (.*) \".*\" (.*) \"(.*)\"$")
-        comp_dash = re.compile(r"^.* (\d\d\d\.\d\d\.\d\.\d) - - \[(.*)\] \"GET \/.*\/dash\/(.*)\/(.*)\.m4a HTTP\/1\.1\" (.*) (.*) \".*\" (.*) \"(.*)\"$")
-
-        
+        comp_hls = re.compile(r"^.* (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(.*)\] \"GET \/.*\/hls\/(.*_.*)\/(.*)\.ts HTTP\/1\.1\" (\d\d\d) (\d*) \".*\" (.*) \"(.*)\"$")
+        comp_dash = re.compile(r"^.* (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[(.*)\] \"GET \/.*\/dash\/(.*)\/(.*)\.m4a HTTP\/1\.1\" (\d\d\d) (\d*) \".*\" (.*) \"(.*)\"$")
+       
         # Copy current syslog file to temp
         # This is to ensure that we don't block the file for system writing
         # Parse over time range, and add to DB
@@ -142,23 +150,26 @@ class Parse:
 
         return self._get_num_unique_ip_per_minute()
 
-def parse_db(start_day, end_day, debug=False):
-
-    if debug:
+def parse_db(start_day, end_day, log_level='error'):
+    if log_level == 'debug':
         log.setLevel(logging.DEBUG)
-    else:
-        log.setLevel(logging.ERROR)
-
+    elif log_level == 'info':
+        log.setLevel(logging.INFO)
+    
     p = Parse(start_day, end_day)
     p.parse_log_to_db()
-    return p.get_connections_per_stream()
+    c = p.get_connections_per_stream()
+    log.info(c)
+    return c 
 
 if __name__ == "__main__":
 
+    right_now = datetime.datetime.strftime(datetime.datetime.now(), "%Y-%m-%d")
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("start_day", help='2020-06-22')
+    parser.add_argument("start_day", nargs="?", default=right_now, help='2020-06-22')
     parser.add_argument("end_day", nargs="?", help='2020-06-23')
-    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--log-level", dest="log_level")
     args = parser.parse_args()
 
-    parse_db(args.start_day, args.end_day, args.debug)
+    parse_db(args.start_day, args.end_day, args.log_level)
