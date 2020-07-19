@@ -7,21 +7,7 @@
 !action.sh
 !docker-compose.yaml
 
-!rtmp_nginx_20_04/dockerfile
-
-!web/dockerfile
-!web/nginx.conf
-!web/player.html.example
-!web/stat.xsl
-!web/cmd.sh
-!web/syslog-ng.conf
-!web/parse_db.py   
-
-!rtmp/dockerfile
-!rtmp/nginx.conf
-!rtmp/stat.xsl
-!rtmp/cmd.sh
-!rtmp/syslog-ng.conf
-
-!haproxy/dockerfile
-!haproxy/haproxy.cfg
+!rtmp_nginx_20_04/
+!rtmp/
+!web/
+!haproxy/
